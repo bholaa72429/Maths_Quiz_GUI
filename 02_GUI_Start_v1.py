@@ -7,7 +7,7 @@ class Start:
     def __init__(self, parent):
 
         # formatting variable
-        background_color = "light yellow"
+        background_color = "#C8D5EC"
 
         # GUI - number of rounds
         self.start_frame = Frame(bg=background_color,pady=10)
@@ -43,8 +43,8 @@ class Start:
         # Play Button
         self.play_button = Button(text="Continue",
                                        command=lambda: self.to_play(),
-                                       font="arial 10",width=30, bg="#00FA9A")
-        self.play_button.grid(row=4)
+                                       font="arial 10",width=30, bg="#C8ECDD",padx=10)
+        self.play_button.grid(row=4,pady=10,)
 
     def to_play(self):
         wanted_rounds = self.round_entry.get()
@@ -64,7 +64,7 @@ class Start:
             if wanted_rounds < 1:
                 has_errors = "yes"
                 error_feedback = "Sorry, the least you" \
-                                 "can play with is 1 question"
+                                 "can play with is 1 rounds"
             elif wanted_rounds > 10:
                 has_errors = "yes"
                 error_feedback = "Too high! The most rounds " \
@@ -72,7 +72,7 @@ class Start:
 
         except ValueError:
             has_errors = "yes"
-            error_feedback = "Please enter a number of rounds wished to ply (no text / decimals)"
+            error_feedback = "Enter rounds wished to ply (no text / decimals)"
 
         if has_errors == "yes":
             self.round_entry.config(bg=error_back)
@@ -80,6 +80,9 @@ class Start:
 
         else:
             Game(self, wanted_rounds)
+
+            # hide starts up window
+            root.withdraw()
 
 
 class Game:
@@ -109,12 +112,21 @@ class Game:
         self.answer_entry = Entry(self.game_frame, font="Arial 15 bold")
         self.answer_entry.grid(row=2)
 
+        # Submit Button
+        #self.submit_button = Button(text="Submit",
+
+                                  #font="arial 10", width=5, bg="#00FA9A")
+        #self.submit_button.grid(row=3)
+
         # Round Label
         self.round_frame = Frame(self.game_frame)
         self.round_frame.grid(row=1)
 
         self.rounds_label = Label(self.game_frame, text=" Number of Rounds...")
         self.rounds_label.grid(row=3)
+
+
+
 
 
 # main routine
