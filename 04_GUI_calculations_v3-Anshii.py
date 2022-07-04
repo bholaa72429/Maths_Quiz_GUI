@@ -1,9 +1,11 @@
 # Combine rounds gui with current work
 # generate questions
 from tkinter import *
+
 from functools import partial # to prevent unwanted windows
 
 import random
+
 class Start:
     def __init__(self, parent):
 
@@ -124,6 +126,7 @@ class Game:
                                     command=lambda: self.check_ans(self.answer_entry_label))
         self.submit_button.grid(row=8, pady=10, padx=10)
 
+
         self.answer_entry_label = Label(self.game_frame,font="Arial 15 bold",fg="red", text="",pady=10)
         self.answer_entry_label.grid(row=6)
 
@@ -133,8 +136,6 @@ class Game:
 
         self.rounds_label = Label(self.game_frame, text=" Number of Rounds left...")
         self.rounds_label.grid(row=9)
-
-
 
         # help and game stats button (row 5)
         self.help_export_frame = Frame(self.game_frame)
@@ -162,21 +163,28 @@ class Game:
 
     def try_again(self):
         symbol = ['+', '-', '*', '/']
+
         num_one = random.randint(10, 20)
         num_two = random.randint(1, 10)
         sign = random.choice(symbol)
-
+        print(num_one,num_two,sign)
+        # value = print(num_one, num_two, sign)
+        # ans = eval("value")
         self.question_label= Label(self.game_frame,text=f"{num_one}{sign}{num_two}",font="Arial 15 bold", )
-        self.question_label.grid(row=4, pady=10, padx=10)
+        self.question_label.grid(row=3, pady=10, padx=10)
         return num_one,num_two,sign
 
     def check_ans(self,answer_entry):
-        num_one = self.try_again()[0]
-        num_two = self.try_again()[1]
-        sign = self.try_again()[2]
+        # get the values from try again
+        num_one,num_two,sign = self.try_again()
+        print(num_one,num_two,sign)
 
-        # get user answer
-        user_ans = self.answer_entry.get()
+       # get user answer
+        user_ans = int(self.answer_entry.get())
+        print(user_ans,answer_entry)
+
+        # Disable buttons at start
+        # self.submit_button.config(state=DISABLED)
 
         # set error bg colours (and assume that there are no
         # errors at the start
@@ -190,20 +198,24 @@ class Game:
         try:
             # For addiction
             if sign == '+':
-                ans = num_one + num_two
-
+                ans = int(num_one + num_two)
+                print("add")
+                #print(ans)
             # For subtraction
             elif sign == '-':
-                ans = num_one - num_two
-
+                ans = int(num_one - num_two)
+                #print("subtract")
+                print(ans)
             # For division
             elif sign == '/':
-                ans = num_one / num_two
-
+                ans = int(num_one / num_two)
+                #print("division")
+                print(ans)
             # For multiplication
             else:
-                ans = num_one * num_two
-
+                ans = int(num_one * num_two)
+                #print("multipy")
+                print(ans)
         except ValueError:
             has_errors = "yes"
             error_feedback = "Enter a valid number (no text)"
@@ -213,9 +225,11 @@ class Game:
         if user_ans == ans:
             result_feedback = "RIGHT"
             self.answer_entry_label.config(text=result_feedback)
+            #self.answer_entry['textvariable']=""
         else:
-            result_feedback = "Wrong"
+            result_feedback = "WRONG"
             self.answer_entry_label.config(text=result_feedback)
+            #self.answer_entry['textvariable'] = ""
 
 # main routine
 if __name__ == "__main__":
