@@ -170,6 +170,8 @@ class Game:
         self.stats_button = Button(self.help_export_frame, text= "Game Stats...",
                                    font="Arial 15 bold", bg="#003366", fg="white")
         self.stats_button.grid(row=0, column=2, padx=10)
+        self.next_button.config(state=DISABLED)
+        self.submit_button.config(state=DISABLED)
 
 
 
@@ -184,9 +186,17 @@ class Game:
         #print(num_one,num_two,sign)
         # put the values in equation format
         value = str((self.num_one)) +''+ self.sign +''+ str((self.num_two ))
+        # calculate the answer
         self.ans_calc = eval(value)
+        # reset the entry box value / color
+        self.answer_entry.config(bg="white")
+        self.answer_entry.delete(0,8)
+        self.next_button.config(state=DISABLED)
+        self.submit_button.config(state=NORMAL)
+        self.question_label = Label(self.game_frame, text=value,
+                                    font="Arial 15 bold", )
 
-        self.question_label= Label(self.game_frame,text=f"{self.num_one}{self.sign}{self.num_two}",font="Arial 15 bold", )
+        #self.question_label= Label(self.game_frame,text=f"{self.num_one}{self.sign}{self.num_two}",font="Arial 15 bold", )
         self.question_label.grid(row=4, pady=10, padx=10)
         round = self.current_round
         print(round)
@@ -231,12 +241,18 @@ class Game:
                 print('Correct!\nPoints: ', points)
                 result_feedback = "RIGHT"
                 self.answer_entry_label.config(text=result_feedback)
+                self.answer_entry.config(bg="green")
+                self.next_button.config(state=NORMAL)
+                self.submit_button.config(state=DISABLED)
 
             else:
                 points -= 1
                 print('Wrong!\nSolution: ' + str(ans) + '\nPoints: ', points)
                 result_feedback = "WRONG"
                 self.answer_entry_label.config(text=result_feedback)
+                self.answer_entry.config(bg="red")
+                self.next_button.config(state=NORMAL)
+                self.submit_button.config(state=DISABLED)
 
         except ValueError:
             has_errors = "yes"
