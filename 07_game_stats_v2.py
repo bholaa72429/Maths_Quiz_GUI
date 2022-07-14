@@ -1,7 +1,8 @@
 from tkinter import *
 from functools import partial # to prevent unwanted windows
-
+import re
 import random
+from time import strftime
 
 class Start:
     def __init__(self, parent):
@@ -302,8 +303,8 @@ class GameStats:
         self.game_played_label = Label(self.details_frame, text="Current Round Played", font=heading,anchor="e")
 
         self.game_played_label.grid(row=3, column= 0, padx = 0)
-        rounds = total_rounds-current_rounds
-        self.game_played_value_label = Label(self.details_frame, font=content, text=rounds, anchor="w")
+        rounds_played = total_rounds-current_rounds
+        self.game_played_value_label = Label(self.details_frame, font=content, text=rounds_played, anchor="w")
 
         self.game_played_value_label.grid(row=3, column=1, padx=0)
 
@@ -324,11 +325,161 @@ class GameStats:
                                   command=partial(self.close_stats, partner))
 
         self.dismiss_btn.grid(row=5)
+        self.export_btn = Button(self.details_frame, text="Export",
+                                  width=10, bg="#660000", fg="white", font="arial 14 bold",
+                                  command=lambda: self.export(points, rounds_played, total_rounds))
+
+        self.export_btn.grid(row=9)
 
     def close_stats(self, partner):
         # put help button back to normal...
         partner.stats_button.config(state=NORMAL)
         self.stats_box.destroy()
+
+    def export(self, points, current_round, total_round):
+        Export(self, points, current_round, total_round)
+
+class Export:
+    def __init__(self,partner, points, current_round, total_round):
+
+
+
+        # disable help button
+        partner.export_btn.config(state=DISABLED)
+
+        # Sets up child window (ie: help box)
+        self.export_box = Toplevel()
+
+        # if user press cross at the top, closes help and 'releases' help button
+        self.export_box.protocol('WM_DELETE_WINDOW', partial(self.close_export, partner))
+
+        # Set up GUI frame
+        self.export_frame = Frame(self.export_box, width=300)
+        self.export_frame.grid()
+
+        # set yp export heading row 0
+        self.how_heading = Label(self.export_frame, text="Export/ Instruction", font="arial 14 bold")
+        self.how_heading.grid(row=0)
+
+        # history text (label, row 1 )
+        self.export_text = Label(self.export_frame,
+                                 text="Enter a filename "
+                                      "in the box below"
+                                      "and press the SAVE "
+                                      "button to save your "
+                                      "calculation history"
+                                      "to the text file",
+                                 wrap=250, font="arial 10 italic",
+                                 justify=LEFT, width=40)
+        self.export_text.grid(row=1)
+
+        # Warning text (label, row 2)
+        self.export_text = Label(self.export_frame, text="If the filename you "
+                                                         "entered below"
+                                                         "already exists,"
+                                                         "its content will be "
+                                                         "replaced with your calculation history",
+                                 justify=LEFT, bg='#ffafaf', fg='maroon',
+                                 font="Arial 10 italic", wrap=225, padx=10, pady=10)
+        self.export_text.grid(row=2, pady=10)
+
+        # Filename entry box (row 3)
+        self.filename_entry = Entry(self.export_frame, width=20,
+                                    font="Arial 14 bold", justify=CENTER)
+        self.filename_entry.grid(row=3, pady=10)
+
+        # Error Message Labels (initially blank, row 4)
+        self.save_error_label = Label(self.export_frame, text="", fg='maroon')
+        self.save_error_label.grid(row=4)
+
+        # Save \ Cancel Frame (row 5)
+        self.save_cancel_frame = Frame(self.export_frame)
+        self.save_cancel_frame.grid(row=5, pady=10)
+
+        # Save \ Cancel BUTTON (row 0 of save_cancel_frame)
+        self.save_button = Button(self.save_cancel_frame, text="Save",
+                                  font="Arial 15 bold", bg="#003366", fg="white",
+                                  command=lambda: self.save_history(partner, points, current_round, total_round))
+        self.save_button.grid(row=0, column=0)
+
+        self.cancel_button = Button(self.save_cancel_frame, text="Cancel",
+                                    font="Arial 15 bold", bg="#660000", fg="white",
+                                    command=partial(self.close_export, partner))
+        self.cancel_button.grid(row=0, column=1)
+
+    def save_history(self, partner, points, current_round, total_round):
+
+        # Regular expression to check filename is valid
+        valid_char = "[A-Za-z0-9_]"
+        has_error = "no"
+
+        # timestamp
+        time_string = strftime("%H:%M:%S %p \n Day: %A  \n Date: %x")
+        date_display = "Time: {}".format(time_string)
+        # print(date_display)
+
+        filename = self.filename_entry.get()
+        print(filename)
+
+        # filename = input("Enter a filename: ")
+        # print(filename)
+
+        for letter in filename:
+            if re.match(valid_char, letter):
+                continue
+
+            elif letter == " ":
+                problem = "(no spaces allowed)"
+            else:
+                problem = ("(no {}'s allowed)".format(letter))
+            has_error = "yes"
+            break
+
+        if filename == "":
+            problem = "can't be blank"
+            has_error = "yes"
+
+        if has_error == "yes":
+            # Display error message
+            self.save_error_label.config(text="invalid filename - {}".format(problem))
+            # Change entry box background to pick
+            self.filename_entry.config(bg="#ffafaf")
+            print()
+
+        else:
+            # if there are no error, generate text file and then close dialouge
+            filename = filename + ".txt"
+
+            # create file to hold data
+            f = open(filename, "w+")
+
+            # Heading for Stats
+            f.write(date_display)
+            f.write("\n\n")
+            f.write("Total Rounds\n\n")
+
+            f.write(str(total_round) + "\n")
+
+            f.write("\n\n")
+            f.write("Rounds Played\n\n")
+
+            f.write(str(current_round) + "\n")
+            # Heading for Rounds
+            f.write("\nCorrect Answer\n\n")
+            f.write(str(points) + "\n")
+            # add new line at the end of each item
+
+
+            # close file
+            f.close()
+
+            # close dialogue
+            self.close_export(partner)
+
+    def close_export(self, partner):
+        # Put export button back
+        partner.export_btn.config(state=NORMAL)
+        self.export_box.destroy()
 
 
 # main routine
