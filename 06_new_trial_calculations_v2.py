@@ -174,23 +174,28 @@ class Game:
 
 
     def try_again(self):
+        self.play_button.destroy()
+
+        # generating random signs and numbers
         symbol = ['+', '-', '*', '/']
         self.num_one = random.randint(10, 20)
         self.num_two = random.randint(1, 10)
         self.sign = random.choice(symbol)
         #print(num_one,num_two,sign)
+        # put the values in equation format
         value = str((self.num_one)) +''+ self.sign +''+ str((self.num_two ))
         self.ans_calc = eval(value)
 
         self.question_label= Label(self.game_frame,text=f"{self.num_one}{self.sign}{self.num_two}",font="Arial 15 bold", )
-        self.question_label.grid(row=3, pady=10, padx=10)
+        self.question_label.grid(row=4, pady=10, padx=10)
         round = self.current_round
         print(round)
         # For testing purposes, just add 10
         if self.current_round < 1:
-            self.next_button.destroy()
-            self.submit_button.destroy()
-            self.play_button.config(text="GAME OVER")
+            self.question_label.destroy()
+            self.next_button.config(state=DISABLED)
+            self.submit_button.config(state=DISABLED)
+            self.answer_entry_label.config(text="GAME OVER")
             self.game_box.focus()
         else:
             self.current_round -= 1
@@ -202,19 +207,9 @@ class Game:
 
 
     def check_ans(self):
-        # get user answer
-        user_ans = int(self.answer_entry.get())
-        ans = int(self.ans_calc)
-        # get the values
-        #ans = self.try_again()
-        print(ans, user_ans)
-        points = self.points
 
 
 
-
-        # Disable buttons at start
-        # self.submit_button.config(state=DISABLED)
 
         # set error bg colours (and assume that there are no
         # errors at the start
@@ -224,13 +219,18 @@ class Game:
         # change bg to white (for testing purposes)
         self.answer_entry.config(bg="white")
         self.answer_entry_label.config(text="")
+
         try:
+            # get user answer
+            user_ans = int(self.answer_entry.get())
+            ans = int(self.ans_calc)
+            print(ans, user_ans)
+            points = self.points
             if user_ans == ans:
                 points += 1
                 print('Correct!\nPoints: ', points)
                 result_feedback = "RIGHT"
                 self.answer_entry_label.config(text=result_feedback)
-
 
             else:
                 points -= 1
@@ -238,12 +238,11 @@ class Game:
                 result_feedback = "WRONG"
                 self.answer_entry_label.config(text=result_feedback)
 
-
-
-
         except ValueError:
             has_errors = "yes"
             error_feedback = "Enter a valid number (no text)"
+
+        if has_errors == "yes":
             self.answer_entry.config(bg=error_back)
             self.answer_entry_label.config(text=error_feedback)
 
