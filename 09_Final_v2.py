@@ -254,7 +254,7 @@ class Game:
                 self.submit_button.config(state=DISABLED)
 
                 # appending the export list
-                label = " Question : {} - Correct answer =  {}  < Your answer = {} Result =  {} >".format(question,
+                label = " Question : {} -> Correct answer =  {}  < Your answer = {} Result =  {} >".format(question,
                             ans,user_ans, result_feedback)
                 self.all_ques_list.append(label)
 
@@ -270,7 +270,7 @@ class Game:
                 self.submit_button.config(state=DISABLED)
 
                 # appending the export list
-                label = " Question : {} - Correct answer =  {}  < Your answer = {} Result =  {} >".format(question, ans, user_ans,                                                                                                    result_feedback)
+                label = " Question : {} -> Correct answer =  {}  < Your answer = {} Result =  {} >".format(question, ans, user_ans,                                                                                                    result_feedback)
                 self.all_ques_list.append(label)
 
         except ValueError:
